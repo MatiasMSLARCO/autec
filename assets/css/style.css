@@ -1,0 +1,515 @@
+/* AUTEC — estilos base
+   Spacing/tipografía/efectos medidos del CSS+IX2 compilado de turah.com.
+   Ver Turah_Efectos_Homepage_Reales.md para el mapa de interacciones. */
+
+/* Easings Webflow (usados por GSAP CustomEase y por transiciones CSS) */
+:root {
+  --e-quart: cubic-bezier(.165, .84, .44, 1);
+  --e-expo:  cubic-bezier(.19, 1, .22, 1);
+  --e-quint: cubic-bezier(.23, 1, .32, 1);
+  --e-ease:  cubic-bezier(.25, .1, .25, 1);
+}
+
+/* NO scroll-behavior:smooth — Lenis maneja el smooth scroll (conflicto conocido) */
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ffffff;
+  color: #131313;
+  font-size: .9rem;
+  line-height: 1.25rem;
+  margin: 0;
+}
+
+.font-display { font-family: 'Anton', sans-serif; }
+
+/* ===== Tipografía ===== */
+.heading-xl {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 4rem;
+  line-height: 1;
+}
+@media (max-width: 991px) { .heading-xl { font-size: 3rem; line-height: 1.1; } }
+@media (max-width: 479px) { .heading-xl { font-size: 1.8rem; line-height: 1.15; } }
+
+.heading-model {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 2.5rem;
+}
+@media (max-width: 991px) { .heading-model { font-size: 3rem; margin-bottom: 2rem; } }
+@media (max-width: 479px) { .heading-model { font-size: 1.8rem; margin-bottom: 1.5rem; } }
+
+.eyebrow {
+  font-size: .8rem;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  line-height: 120%;
+  color: #9b9b9b;
+}
+
+.text-outline {
+  -webkit-text-stroke: 1px #c2c2c2;
+  color: transparent;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 15vw;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ===== PRELOADER (a-3): paneles que se retiran ===== */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  background: transparent;
+  pointer-events: none;
+}
+.preloader-panel {
+  flex: 1;
+  background: #131313;
+  transform: scaleY(1);
+  transform-origin: top;
+}
+.no-js .preloader { display: none; }
+@media (prefers-reduced-motion: reduce) { .preloader { display: none; } }
+
+/* ===== HEADER — fixed, mix-blend-mode:difference ===== */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  transform: translateY(0);
+  transition: transform 1s var(--e-ease);
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+.site-header[data-hidden="true"] { transform: translateY(-100%); }
+/* El wordmark fixed del hero es la marca superior persistente → ocultamos el logo duplicado del nav.
+   Sin JS sí lo mostramos (no hay wordmark animado). */
+.nav-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+}
+.no-js .nav-logo { display: block; }
+
+/* ===== HERO — full-bleed + wordmark gigante que se encoge (scroll_logo) ===== */
+.section-hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #131313;
+}
+.hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+  will-change: transform;
+}
+/* Fixed: la marca persiste arriba durante todo el scroll (patrón real .logo_home-large) */
+.hero-wordmark {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  pointer-events: none;
+}
+.hero-wordmark span {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  color: #ffffff;
+  mix-blend-mode: difference;   /* visible sobre hero oscuro Y secciones claras */
+  letter-spacing: .06em;
+  font-size: 22vw;
+  line-height: .8;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+/* ===== Stacked sections — overlap reveal (secciones apiladas estilo Turah 4.4) =====
+   Cada panel es sticky top:0; el siguiente (más abajo en el DOM) sube y lo cubre. */
+.stack { position: relative; }
+.stack-panel {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 6rem;
+  background: #131313;
+}
+.stack-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.stack-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.8), rgba(0,0,0,.15) 55%, rgba(0,0,0,.35));
+  z-index: 1;
+}
+.stack-content { position: relative; z-index: 2; }
+/* Se oscurece a medida que el panel es cubierto por el siguiente (profundidad) */
+.stack-shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.no-js .stack-panel { position: relative; }
+@media (prefers-reduced-motion: reduce) { .stack-panel { position: relative; } }
+@media (max-width: 767px) { .stack-panel { padding-bottom: 4rem; } }
+
+/* ===== Reveal de imagen con máscara (a-6) ===== */
+.reveal {
+  position: relative;
+  overflow: hidden;
+}
+.reveal .image_reveal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.2);
+  will-change: transform;
+}
+.reveal .overlay_reveal {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  transform-origin: bottom;
+}
+.no-js .reveal .image_reveal { transform: none; }
+.no-js .reveal .overlay_reveal { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal .image_reveal { transform: none; }
+  .reveal .overlay_reveal { display: none; }
+}
+
+/* ===== Reveal genérico de texto (fade + translate) ===== */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] { opacity: 1; transform: none; }
+}
+
+/* ===== Link con dual-text slide (a-10) ===== */
+.link-arrow svg { transition: transform .3s var(--e-quint); }
+.link-arrow:hover svg { transform: translate(4px, -4px); }
+
+/* ===== Botones ===== */
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  text-transform: uppercase;
+  font-size: .8rem;
+  letter-spacing: .1rem;
+  font-weight: 600;
+  background-color: #131313;
+  color: #fff;
+  border: 1px solid #131313;
+  transition: background-color .3s var(--e-quint);
+}
+.btn-solid:hover { background-color: #000; }
+
+/* Botón invert (a-12): panel rellena desde abajo + texto swap */
+.btn-invert {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border: 1px solid #fff;
+  background-color: rgba(255, 255, 255, .05);
+  -webkit-backdrop-filter: blur(.5rem);
+  backdrop-filter: blur(.5rem);
+  color: #fff;
+  text-transform: uppercase;
+  font-size: .8rem;
+  letter-spacing: .1rem;
+  overflow: hidden;
+}
+.btn-invert .bg_fill {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: translateY(100%);
+  transition: transform .5s var(--e-quint);
+  z-index: 0;
+}
+.btn-invert:hover .bg_fill { transform: translateY(0); }
+.btn-invert .btn-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 1.2rem;
+  overflow: hidden;
+}
+.btn-invert .btn-text span {
+  height: 1.2rem;
+  line-height: 1.2rem;
+  transition: transform .5s var(--e-quint), color .5s var(--e-quint);
+}
+.btn-invert:hover .btn-text span { transform: translateY(-1.2rem); color: #131313; }
+
+/* Inputs línea inferior */
+.field-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #686868;
+  padding: .75rem 0;
+  font-size: .95rem;
+  color: #131313;
+}
+.field-input::placeholder { color: #9b9b9b; }
+.field-input:focus { outline: none; border-color: #131313; }
+
+/* ===== Sección Vehículos — foto familia con paneo (move_rotation) + slider ===== */
+.fleet-wrap { position: relative; overflow: hidden; }
+.fleet-photo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.fleet-fade {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(#ffffff00 80%, #ffffff 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+[data-slider-track] { position: relative; }
+.model-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.model-slide[data-active="true"] {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+}
+.model-image {
+  max-width: 851px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 2.5rem;
+  will-change: transform, opacity;
+}
+.model-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 40rem;
+  margin-bottom: 2.5rem;
+}
+.model-info { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.model-value { font-size: .85rem; color: #505050; }
+@media (max-width: 767px) { .model-spec-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; } }
+
+.slider-arrow {
+  position: absolute;
+  bottom: 2.5rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border: 1px solid #131313;
+  background-color: rgba(0, 0, 0, .04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #131313;
+  transition: background-color .2s var(--e-ease);
+}
+.slider-arrow:hover { background-color: rgba(0, 0, 0, .1); }
+@media (max-width: 767px) { .slider-arrow { width: 2.4rem; height: 2.4rem; } }
+
+/* ===== Footer ===== */
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  padding-bottom: 4rem;
+}
+@media (max-width: 767px) { .footer-links-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+
+.footer-wordmark { margin-top: 2rem; }
+.js .footer-wordmark { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .js .footer-wordmark { opacity: 1; } }
+
+/* ===== SECCIÓN MODELOS — ESTILO TURAH ===== */
+.section-models {
+  position: relative;
+  background-color: #ffffff;
+  padding: 8rem 2.5rem 8rem;
+  overflow: hidden;
+  border-top: 1px solid #f0f0f0;
+}
+@media (max-width: 991px) {
+  .section-models { padding: 6rem 1.5rem 6rem; }
+}
+@media (max-width: 767px) {
+  .section-models { padding: 4rem 1.25rem 4.5rem; }
+}
+
+.model-showcase {
+  max-width: 68rem;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.model-title-main {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  letter-spacing: .05em;
+  line-height: 1.05;
+  color: #131313;
+  margin-top: 0.25rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.model-stage {
+  position: relative;
+  width: 100%;
+  max-width: 54rem;
+  height: clamp(240px, 34vw, 410px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0 3rem;
+}
+
+.model-car-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.model-specs-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  max-width: 52rem;
+  text-align: center;
+  gap: 1.5rem;
+  margin-bottom: 3.5rem;
+  padding: 0 1rem;
+}
+@media (max-width: 640px) {
+  .model-specs-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 1rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+.model-spec-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.model-spec-item .spec-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #9b9b9b;
+  font-weight: 500;
+}
+
+.model-spec-item .spec-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #131313;
+  letter-spacing: 0.02em;
+}
+
+.model-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 52rem;
+  padding: 0 1rem;
+}
+
+.btn-arrow-box {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d4d4d4;
+  background: #ffffff;
+  color: #131313;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+}
+.btn-arrow-box:hover {
+  border-color: #131313;
+  background: #131313;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.btn-arrow-box:active {
+  transform: translateY(0);
+}
+
+.btn-read-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.15rem 3.5rem;
+  background-color: #2e2e2e;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  border: 1px solid #2e2e2e;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-read-more:hover {
+  background-color: #000000;
+  border-color: #000000;
+  transform: translateY(-1px);
+}
