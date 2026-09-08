@@ -8,9 +8,19 @@
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const hasGsap = Boolean(window.gsap && window.ScrollTrigger);
 
+  // Recarga siempre desde arriba: evita que el wordmark fixed quede a medio scrub
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.scrollTo(0, 0);
+  // Fuerza top antes de descargar y al volver desde bfcache
+  window.addEventListener("beforeunload", () => window.scrollTo(0, 0));
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) window.scrollTo(0, 0);
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
+    window.scrollTo(0, 0);
     initMobileNav();
     initNavHideShow();
     initContactForm();
@@ -34,7 +44,11 @@
     initStackedSections(); // overlap reveal (secciones apiladas)
     initFooterWordmark();
 
-    window.addEventListener("load", () => ScrollTrigger.refresh());
+    window.addEventListener("load", () => {
+      if (window._lenis) window._lenis.scrollTo(0, { immediate: true });
+      else window.scrollTo(0, 0);
+      ScrollTrigger.refresh();
+    });
   }
 
   // ---- Smooth scroll (Lenis) sincronizado con ScrollTrigger ----
@@ -48,6 +62,8 @@
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
+    lenis.scrollTo(0, { immediate: true });
+    window._lenis = lenis;
   }
 
   // ---- Secuencia de carga: preloader se retira, hero y nav revelan ----
@@ -57,7 +73,7 @@
       ? preloader.querySelectorAll(".preloader-panel")
       : [];
     const heroMedia = document.querySelector("[data-hero-media]");
-    const heroWord = document.querySelector("[data-hero-wordmark]");
+    const heroWord = document.querySelectorAll("[data-hero-wordmark], [data-hero-chevron]");
 
     // reveal_hero (a-29): zoom lento del media al cargar
     if (heroMedia) {
@@ -68,11 +84,12 @@
         { scale: 1.05, duration: 6, ease: "power2.out" },
       );
     }
-    if (heroWord)
+    // Solo opacity: el transform (scale/y) lo controla scroll_logo sin conflicto
+    if (heroWord.length)
       gsap.fromTo(
         heroWord,
-        { opacity: 0, y: 40 },
-        { opacity: 0.85, y: 0, duration: 1.2, delay: 0.2, ease: "expo.out" },
+        { opacity: 0 },
+        { opacity: 0.85, duration: 1.2, delay: 0.2, ease: "expo.out" },
       );
 
     const tl = gsap.timeline();
@@ -89,10 +106,10 @@
 
   // ---- scroll_logo (a-32): wordmark gigante scale 1 -> 0.124 al iniciar scroll ----
   function initScrollLogo() {
-    const word = document.querySelector("[data-hero-wordmark]");
+    const word = document.querySelectorAll("[data-hero-wordmark], [data-hero-chevron]");
     const hero = document.querySelector("[data-hero]");
     const header = document.querySelector("[data-site-header]");
-    if (!word || !hero) return;
+    if (!word.length || !hero) return;
 
     // wordmark es position:fixed → centro en 50vh; lo llevamos al tope (nav) al scrollear.
     gsap.to(word, {
@@ -523,8 +540,9 @@
     });
     const fw = document.querySelector("[data-footer-wordmark]");
     if (fw) fw.style.opacity = 1;
-    const hw = document.querySelector("[data-hero-wordmark]");
-    if (hw) hw.style.opacity = 0.85;
+    document.querySelectorAll("[data-hero-wordmark], [data-hero-chevron]").forEach((hw) => {
+      hw.style.opacity = 0.85;
+    });
     const header = document.querySelector("[data-site-header]");
     if (header) header.setAttribute("data-navlogo", "on");
   }

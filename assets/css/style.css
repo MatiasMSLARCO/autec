@@ -120,23 +120,63 @@ body {
 .hero-wordmark {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;         /* ambos SVGs comparten la misma celda → superpuestos */
   z-index: 40;
   pointer-events: none;
 }
-.hero-wordmark span {
-  font-family: 'Anton', sans-serif;
-  text-transform: uppercase;
-  color: #ffffff;
-  mix-blend-mode: difference;   /* visible sobre hero oscuro Y secciones claras */
-  letter-spacing: .06em;
-  font-size: 22vw;
-  line-height: .8;
+/* Ambas capas HTML ocupan la MISMA celda (1/1) → alineadas y escalan juntas.
+   HTML (no <svg>) → GSAP anima CSS transform de forma fiable (encoge de verdad). */
+.hero-wordmark .wm-layer {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: 'Fredoka', sans-serif;
+  line-height: .9;
   transform-origin: center center;
   will-change: transform, opacity;
 }
+.wm-blend { mix-blend-mode: difference; }   /* texto blanco reacciona al video */
+.wm-normal { mix-blend-mode: normal; }       /* chevron naranja real */
+
+/* --- Estructura del logo (tamaños se fijan por contexto: hero / footer) --- */
+.wm-brand {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  letter-spacing: -.04em;
+  color: #ffffff;
+}
+.wm-line {
+  display: flex;
+  align-items: center;
+  gap: .4em;
+  margin-top: .15em;
+}
+.wm-tag {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 400;
+  letter-spacing: .01em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.wm-tag b { font-weight: 600; }
+.wm-chev-gap { display: inline-flex; align-items: center; flex: none; }
+.wm-chev-svg { height: auto; overflow: visible; }
+.wm-chev-svg path {
+  fill: none;
+  stroke: #ee7000;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wm-ghost { visibility: hidden; }   /* reserva layout sin pintarse */
+
+/* --- Tamaños HERO (gigante) --- */
+.hero-wordmark .wm-brand { font-size: 16vw; }
+.hero-wordmark .wm-tag { font-size: 3.1vw; }
+.hero-wordmark .wm-chev-gap,
+.hero-wordmark .wm-chev-svg { width: 3vw; }
 
 /* ===== Stacked sections — overlap reveal (secciones apiladas estilo Turah 4.4) =====
    Cada panel es sticky top:0; el siguiente (más abajo en el DOM) sube y lo cubre. */
@@ -362,9 +402,20 @@ body {
 }
 @media (max-width: 767px) { .footer-links-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
 
-.footer-wordmark { margin-top: 2rem; }
-.js .footer-wordmark { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .js .footer-wordmark { opacity: 1; } }
+/* Logo chico del footer (fondo oscuro → colores reales) */
+.footer-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: .9;
+  transform-origin: left center;
+}
+.footer-logo .wm-brand { font-size: 34px; }
+.footer-logo .wm-tag { font-size: 11px; }
+.footer-logo .wm-chev-gap,
+.footer-logo .wm-chev-svg { width: 11px; }
+.js .footer-logo { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .js .footer-logo { opacity: 1; } }
 
 /* ===== SECCIÓN MODELOS — ESTILO TURAH ===== */
 .section-models {
